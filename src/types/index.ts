@@ -61,30 +61,33 @@ export type BinProduct = {
 };
 
 export type Product = {
+  id: string;
   sku: string;
   name: string;
   description?: string;
-  weight?: number;
-  dimensions?: {
-    width: number;
-    height: number;
-    depth: number;
-  };
+  weight: number;
+  width: number;
+  height: number;
+  depth: number;
   unit?: string;
-  minStock?: number;
-  maxStock?: number;
+  minimum_stock: number;
+  current_stock: number;
   metadata?: Record<string, any>;
 };
 
 export type InventoryMovement = {
   id: string;
-  sku: string;
-  qty: number;
+  product: string;
+  movement_type: 'in' | 'out';
+  quantity: number;
+  reason?: string;
+  timestamp: string;
+  sku?: string;
   fromBin?: string;
   toBin?: string;
-  type: 'receipt' | 'transfer' | 'pick' | 'adjustment';
-  createdBy: string;
-  createdAt: string;
+  type?: 'receipt' | 'transfer' | 'pick' | 'adjustment';
+  createdBy?: string;
+  createdAt?: string;
 };
 
 export type Order = {

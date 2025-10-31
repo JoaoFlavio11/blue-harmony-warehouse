@@ -10,6 +10,8 @@ import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import Warehouses from "./pages/Warehouses";
 import WarehouseDetails from "./pages/WarehouseDetails";
+import Products from "./pages/Products";
+import ProductDetails from "./pages/ProductDetails";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -35,7 +37,8 @@ const App = () => (
               <Route path="dashboard" element={<Dashboard />} />
               <Route path="warehouses" element={<Warehouses />} />
               <Route path="warehouses/:id" element={<WarehouseDetails />} />
-              <Route path="products" element={<div>Products (em desenvolvimento)</div>} />
+              <Route path="products" element={<Products />} />
+              <Route path="products/:id" element={<ProductDetails />} />
               <Route path="inventory" element={<div>Inventory (em desenvolvimento)</div>} />
               <Route path="orders" element={<div>Orders (em desenvolvimento)</div>} />
               <Route path="routing" element={<div>Routing (em desenvolvimento)</div>} />

@@ -1,77 +1,90 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Warehouse, Package, ShoppingCart, AlertTriangle } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import { useDashboardStats } from '@/hooks/useDashboardStats';
+import { StatCard } from '@/components/dashboard/StatCard';
+import {
+  Warehouse,
+  Package,
+  ShoppingCart,
+  AlertTriangle,
+  TrendingUp,
+  BarChart3,
+} from 'lucide-react';
 
 export default function Dashboard() {
-  const stats = [
-    {
-      title: 'Total de Armazéns',
-      value: '3',
-      icon: Warehouse,
-      description: 'Armazéns ativos',
-      color: 'text-primary',
-    },
-    {
-      title: 'Produtos',
-      value: '1.284',
-      icon: Package,
-      description: 'SKUs cadastrados',
-      color: 'text-accent',
-    },
-    {
-      title: 'Pedidos Pendentes',
-      value: '42',
-      icon: ShoppingCart,
-      description: 'Aguardando picking',
-      color: 'text-warning',
-    },
-    {
-      title: 'Estoque Crítico',
-      value: '8',
-      icon: AlertTriangle,
-      description: 'Itens abaixo do mínimo',
-      color: 'text-destructive',
-    },
-  ];
+  const { user } = useAuth();
+  const { data: stats, isLoading } = useDashboardStats();
+
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-3xl font-bold">Dashboard</h1>
+          <p className="text-muted-foreground mt-1">Carregando...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-foreground">Dashboard</h1>
-        <p className="text-muted-foreground">
-          Visão geral do sistema de gerenciamento de armazém
+        <h1 className="text-3xl font-bold">Dashboard</h1>
+        <p className="text-muted-foreground mt-1">
+          Bem-vindo de volta, {user?.name}
         </p>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {stats.map((stat) => {
-          const Icon = stat.icon;
-          return (
-            <Card key={stat.title}>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
-                  {stat.title}
-                </CardTitle>
-                <Icon className={`h-4 w-4 ${stat.color}`} />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{stat.value}</div>
-                <p className="text-xs text-muted-foreground">
-                  {stat.description}
-                </p>
-              </CardContent>
-            </Card>
-          );
-        })}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <StatCard
+          title="Armazéns"
+          value={stats?.totalWarehouses || 0}
+          icon={Warehouse}
+        />
+        <StatCard
+          title="Produtos"
+          value={stats?.totalProducts || 0}
+          icon={Package}
+        />
+        <StatCard
+          title="Pedidos Totais"
+          value={stats?.totalOrders || 0}
+          icon={ShoppingCart}
+        />
+        <StatCard
+          title="Pedidos Pendentes"
+          value={stats?.pendingOrders || 0}
+          icon={TrendingUp}
+          variant={stats && stats.pendingOrders > 10 ? 'warning' : 'default'}
+        />
+        <StatCard
+          title="Ocupação Média"
+          value={`${stats?.averageOccupancy.toFixed(1) || 0}%`}
+          icon={BarChart3}
+          variant={
+            stats && stats.averageOccupancy > 80
+              ? 'error'
+              : stats && stats.averageOccupancy > 60
+              ? 'warning'
+              : 'success'
+          }
+        />
+        <StatCard
+          title="Estoque Crítico"
+          value={stats?.criticalStock || 0}
+          icon={AlertTriangle}
+          variant={stats && stats.criticalStock > 0 ? 'error' : 'success'}
+        />
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>Bem-vindo ao WMS</CardTitle>
+          <CardTitle>Visão Geral do Sistema</CardTitle>
         </CardHeader>
         <CardContent>
           <p className="text-muted-foreground">
-            Sistema de Gerenciamento de Armazém configurado e pronto para uso.
-            Navegue pelo menu lateral para acessar as funcionalidades.
+            Sistema WMS operacional. Use o menu lateral para acessar Armazéns,
+            Produtos, Inventário, Pedidos e outros módulos.
           </p>
         </CardContent>
       </Card>

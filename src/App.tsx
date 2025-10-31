@@ -8,6 +8,8 @@ import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
+import Warehouses from "./pages/Warehouses";
+import WarehouseDetails from "./pages/WarehouseDetails";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -31,7 +33,8 @@ const App = () => (
               }
             >
               <Route path="dashboard" element={<Dashboard />} />
-              <Route path="warehouses" element={<div>Warehouses (em desenvolvimento)</div>} />
+              <Route path="warehouses" element={<Warehouses />} />
+              <Route path="warehouses/:id" element={<WarehouseDetails />} />
               <Route path="products" element={<div>Products (em desenvolvimento)</div>} />
               <Route path="inventory" element={<div>Inventory (em desenvolvimento)</div>} />
               <Route path="orders" element={<div>Orders (em desenvolvimento)</div>} />

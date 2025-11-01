@@ -12,6 +12,8 @@ import Warehouses from "./pages/Warehouses";
 import WarehouseDetails from "./pages/WarehouseDetails";
 import Products from "./pages/Products";
 import ProductDetails from "./pages/ProductDetails";
+import Orders from "./pages/Orders";
+import OrderDetails from "./pages/OrderDetails";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -40,7 +42,8 @@ const App = () => (
               <Route path="products" element={<Products />} />
               <Route path="products/:id" element={<ProductDetails />} />
               <Route path="inventory" element={<div>Inventory (em desenvolvimento)</div>} />
-              <Route path="orders" element={<div>Orders (em desenvolvimento)</div>} />
+              <Route path="orders" element={<Orders />} />
+              <Route path="orders/:id" element={<OrderDetails />} />
               <Route path="routing" element={<div>Routing (em desenvolvimento)</div>} />
               <Route path="analytics" element={<div>Analytics (em desenvolvimento)</div>} />
               <Route path="reports" element={<div>Reports (em desenvolvimento)</div>} />

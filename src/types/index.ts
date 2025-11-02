@@ -108,21 +108,26 @@ export type OrderItem = {
 
 export type Route = {
   id: string;
+  name?: string;
   orderId: string;
+  status?: 'pending' | 'in_progress' | 'completed';
   sequence: RouteNode[];
+  nodes: RouteNode[];
   estimatedDistanceM?: number;
   estimatedTimeS?: number;
+  totalDistance: number;
+  estimatedTime: number;
   createdAt: string;
 };
 
 export type RouteNode = {
   binId: string;
   binCode: string;
-  skuList: string[];
-  position?: {
-    x: number;
-    y: number;
-  };
+  skuList?: string[];
+  position: string;
+  sequence: number;
+  distance: number;
+  estimatedTime: number;
 };
 
 export type Report = {

@@ -1,17 +1,25 @@
 /**
- * Auth Context - Mock inicial
- * Simula autenticação até integração Firebase
+ * Auth Context - Firebase Authentication
  */
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { User } from '@/types';
 import apiClient from '@/lib/api-client';
+import {
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  signOut,
+  onAuthStateChanged,
+  User as FirebaseUser,
+} from 'firebase/auth';
+import { auth } from '@/lib/firebase';
 
 type AuthContextType = {
   user: User | null;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
-  logout: () => void;
+  signup: (email: string, password: string) => Promise<void>;
+  logout: () => Promise<void>;
   isAuthenticated: boolean;
 };
 
@@ -32,51 +40,90 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Verificar se tem token no localStorage
-    const token = apiClient.getToken();
-    const storedUser = localStorage.getItem('user');
+    // Listener para mudanças de autenticação do Firebase
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser: FirebaseUser | null) => {
+      if (firebaseUser) {
+        // Usuário autenticado
+        const token = await firebaseUser.getIdToken();
+        const appUser: User = {
+          id: firebaseUser.uid,
+          email: firebaseUser.email || '',
+          name: firebaseUser.displayName || firebaseUser.email?.split('@')[0] || '',
+          role: 'admin',
+          createdAt: firebaseUser.metadata.creationTime || new Date().toISOString(),
+        };
 
-    if (token && storedUser) {
-      try {
-        setUser(JSON.parse(storedUser));
-      } catch (error) {
-        console.error('Error parsing stored user:', error);
-        localStorage.removeItem('user');
+        apiClient.setToken(token);
+        localStorage.setItem('user', JSON.stringify(appUser));
+        setUser(appUser);
+      } else {
+        // Usuário não autenticado
         apiClient.setToken(null);
+        localStorage.removeItem('user');
+        setUser(null);
       }
-    }
+      setIsLoading(false);
+    });
 
-    setIsLoading(false);
+    return () => unsubscribe();
   }, []);
 
   const login = async (email: string, password: string) => {
     setIsLoading(true);
     try {
-      // Mock login - gera token fake
-      const mockToken = `mock_token_${Date.now()}`;
-      const mockUser: User = {
-        id: '1',
-        email,
-        name: email.split('@')[0],
-        role: 'admin',
-        createdAt: new Date().toISOString(),
-      };
-
-      apiClient.setToken(mockToken);
-      localStorage.setItem('user', JSON.stringify(mockUser));
-      setUser(mockUser);
-    } catch (error) {
+      await signInWithEmailAndPassword(auth, email, password);
+      // O listener onAuthStateChanged cuidará do resto
+    } catch (error: any) {
       console.error('Login error:', error);
-      throw error;
+      throw new Error(getErrorMessage(error.code));
     } finally {
       setIsLoading(false);
     }
   };
 
-  const logout = () => {
-    apiClient.setToken(null);
-    localStorage.removeItem('user');
-    setUser(null);
+  const signup = async (email: string, password: string) => {
+    setIsLoading(true);
+    try {
+      await createUserWithEmailAndPassword(auth, email, password);
+      // O listener onAuthStateChanged cuidará do resto
+    } catch (error: any) {
+      console.error('Signup error:', error);
+      throw new Error(getErrorMessage(error.code));
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const logout = async () => {
+    try {
+      await signOut(auth);
+      // O listener onAuthStateChanged cuidará da limpeza
+    } catch (error) {
+      console.error('Logout error:', error);
+      throw error;
+    }
+  };
+
+  // Função auxiliar para mensagens de erro em português
+  const getErrorMessage = (errorCode: string): string => {
+    switch (errorCode) {
+      case 'auth/invalid-email':
+        return 'Email inválido';
+      case 'auth/user-disabled':
+        return 'Usuário desabilitado';
+      case 'auth/user-not-found':
+        return 'Usuário não encontrado';
+      case 'auth/wrong-password':
+        return 'Senha incorreta';
+      case 'auth/email-already-in-use':
+        return 'Email já está em uso';
+      case 'auth/weak-password':
+        return 'Senha muito fraca (mínimo 6 caracteres)';
+      case 'auth/network-request-failed':
+        return 'Erro de conexão';
+      default:
+        return 'Erro ao autenticar';
+    }
   };
 
   return (
@@ -85,6 +132,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         user,
         isLoading,
         login,
+        signup,
         logout,
         isAuthenticated: !!user,
       }}

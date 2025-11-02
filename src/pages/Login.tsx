@@ -12,19 +12,31 @@ export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const { login } = useAuth();
+  const [isSignup, setIsSignup] = useState(false);
+  const { login, signup, isAuthenticated } = useAuth();
   const navigate = useNavigate();
+
+  // Redirecionar se já estiver autenticado
+  if (isAuthenticated) {
+    navigate('/dashboard');
+    return null;
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
     try {
-      await login(email, password);
-      toast.success('Login realizado com sucesso!');
+      if (isSignup) {
+        await signup(email, password);
+        toast.success('Conta criada com sucesso!');
+      } else {
+        await login(email, password);
+        toast.success('Login realizado com sucesso!');
+      }
       navigate('/dashboard');
-    } catch (error) {
-      toast.error('Erro ao fazer login. Tente novamente.');
+    } catch (error: any) {
+      toast.error(error.message || 'Erro ao autenticar. Tente novamente.');
     } finally {
       setIsLoading(false);
     }
@@ -37,9 +49,13 @@ export default function Login() {
           <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-primary">
             <Warehouse className="h-6 w-6 text-primary-foreground" />
           </div>
-          <CardTitle className="text-2xl font-bold">WMS System</CardTitle>
+          <CardTitle className="text-2xl font-bold">
+            {isSignup ? 'Criar Conta' : 'WMS System'}
+          </CardTitle>
           <CardDescription>
-            Sistema de Gerenciamento de Armazém
+            {isSignup
+              ? 'Cadastre-se para acessar o sistema'
+              : 'Sistema de Gerenciamento de Armazém'}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -69,12 +85,27 @@ export default function Login() {
               />
             </div>
             <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? 'Entrando...' : 'Entrar'}
+              {isLoading
+                ? isSignup
+                  ? 'Criando conta...'
+                  : 'Entrando...'
+                : isSignup
+                ? 'Criar Conta'
+                : 'Entrar'}
             </Button>
           </form>
-          <p className="mt-4 text-center text-sm text-muted-foreground">
-            Modo demonstração - use qualquer email/senha
-          </p>
+          <div className="mt-4 text-center">
+            <button
+              type="button"
+              onClick={() => setIsSignup(!isSignup)}
+              className="text-sm text-primary hover:underline"
+              disabled={isLoading}
+            >
+              {isSignup
+                ? 'Já tem uma conta? Faça login'
+                : 'Não tem uma conta? Cadastre-se'}
+            </button>
+          </div>
         </CardContent>
       </Card>
     </div>

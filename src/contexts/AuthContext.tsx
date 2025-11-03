@@ -71,10 +71,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const login = async (email: string, password: string) => {
     setIsLoading(true);
     try {
-      await signInWithEmailAndPassword(auth, email, password);
-      // O listener onAuthStateChanged cuidará do resto
+      const result = await signInWithEmailAndPassword(auth, email, password);
+      if (result.user) {
+        console.log('✅ Login bem-sucedido:', result.user.email);
+      }
     } catch (error: any) {
-      console.error('Login error:', error);
+      console.error('❌ Login error:', error);
+      if (error.code === 'auth/api-key-not-valid.-please-pass-a-valid-api-key.') {
+        throw new Error('Firebase não configurado. Configure as variáveis de ambiente do Firebase.');
+      }
       throw new Error(getErrorMessage(error.code));
     } finally {
       setIsLoading(false);
@@ -84,10 +89,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const signup = async (email: string, password: string) => {
     setIsLoading(true);
     try {
-      await createUserWithEmailAndPassword(auth, email, password);
-      // O listener onAuthStateChanged cuidará do resto
+      const result = await createUserWithEmailAndPassword(auth, email, password);
+      if (result.user) {
+        console.log('✅ Conta criada com sucesso:', result.user.email);
+      }
     } catch (error: any) {
-      console.error('Signup error:', error);
+      console.error('❌ Signup error:', error);
+      if (error.code === 'auth/api-key-not-valid.-please-pass-a-valid-api-key.') {
+        throw new Error('Firebase não configurado. Configure as variáveis de ambiente do Firebase.');
+      }
       throw new Error(getErrorMessage(error.code));
     } finally {
       setIsLoading(false);

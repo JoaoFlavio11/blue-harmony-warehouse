@@ -111,7 +111,7 @@ export default function Routing() {
             </Button>
           </div>
           <p className="text-sm text-muted-foreground mt-2">
-            O algoritmo "Nearest Neighbor" calculará a rota mais eficiente entre os bins
+            O algoritmo TSP (Traveling Salesman Problem) com NetworkX calculará a rota mais eficiente entre os bins
           </p>
         </CardContent>
       </Card>

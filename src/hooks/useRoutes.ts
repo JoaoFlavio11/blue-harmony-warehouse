@@ -39,7 +39,7 @@ export const useOptimizeRoute = () => {
 
   return useMutation({
     mutationFn: (orderId: string) =>
-      apiClient.post<Route>('/routes/optimize/', { orderId }),
+      apiClient.post<Route>('/routing/picking-route/', { order_id: orderId }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['routes'] });
       toast.success('Rota otimizada com sucesso!');

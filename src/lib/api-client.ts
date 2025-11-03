@@ -1,10 +1,10 @@
 /**
- * API Client configurado para comunicação com Django API
- * Base URL: localhost:4000
- * Auth: Bearer token (mock inicial, Firebase depois)
+ * API Client configurado para comunicação com Django API Backend
+ * Base URL: localhost:8000/api (configurável via VITE_API_BASE_URL)
+ * Auth: Bearer token do Firebase
  */
 
-const API_BASE_URL = 'http://localhost:4000';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
 
 class ApiClient {
   private baseUrl: string;

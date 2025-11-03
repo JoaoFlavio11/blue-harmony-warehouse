@@ -4,24 +4,20 @@ import {
   LayoutDashboard,
   Warehouse,
   Package,
-  ClipboardList,
   ShoppingCart,
   Route,
   BarChart3,
   FileText,
-  Settings,
 } from 'lucide-react';
 
 const navigation = [
-  { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
+  { name: 'Dashboard', href: '/', icon: LayoutDashboard },
   { name: 'Armazéns', href: '/warehouses', icon: Warehouse },
   { name: 'Produtos', href: '/products', icon: Package },
-  { name: 'Inventário', href: '/inventory', icon: ClipboardList },
   { name: 'Pedidos', href: '/orders', icon: ShoppingCart },
-  { name: 'Rotas', href: '/routing', icon: Route },
+  { name: 'Roteirização', href: '/routing', icon: Route },
   { name: 'Analytics', href: '/analytics', icon: BarChart3 },
   { name: 'Relatórios', href: '/reports', icon: FileText },
-  { name: 'Configurações', href: '/settings', icon: Settings },
 ];
 
 export const Sidebar = () => {

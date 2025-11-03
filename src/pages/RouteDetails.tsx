@@ -11,7 +11,6 @@ import {
 } from '@/components/ui/select';
 import { useRoute, useUpdateRoute } from '@/hooks/useRoutes';
 import { ArrowLeft, MapPin, Clock, TrendingUp, Navigation } from 'lucide-react';
-import { calculateRouteMetrics } from '@/lib/routing-algorithm';
 
 export default function RouteDetails() {
   const { id } = useParams<{ id: string }>();
@@ -35,7 +34,12 @@ export default function RouteDetails() {
     );
   }
 
-  const metrics = calculateRouteMetrics(route.nodes);
+  const metrics = {
+    totalStops: route.nodes.length,
+    totalDistance: route.totalDistance,
+    totalTime: route.estimatedTime,
+    efficiency: route.nodes.length > 0 ? Math.round((route.totalDistance / route.nodes.length) * 100) / 100 : 0,
+  };
 
   const handleStatusChange = (status: string) => {
     updateRoute.mutate({

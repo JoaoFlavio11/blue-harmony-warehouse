@@ -5,7 +5,7 @@ import { DashboardStats } from '@/types';
 export const useDashboardStats = () => {
   return useQuery<DashboardStats>({
     queryKey: ['dashboard-stats'],
-    queryFn: () => apiClient.get<DashboardStats>('/api/dashboard/stats/'),
+    queryFn: () => apiClient.get<DashboardStats>('/dashboard/stats/'),
     // Mock fallback se API não estiver disponível
     placeholderData: {
       totalWarehouses: 0,

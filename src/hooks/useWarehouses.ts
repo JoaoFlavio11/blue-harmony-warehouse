@@ -6,14 +6,14 @@ import { toast } from 'sonner';
 export const useWarehouses = () => {
   return useQuery<Warehouse[]>({
     queryKey: ['warehouses'],
-    queryFn: () => apiClient.get<Warehouse[]>('/api/warehouses/'),
+    queryFn: () => apiClient.get<Warehouse[]>('/warehouses/'),
   });
 };
 
 export const useWarehouse = (id: string) => {
   return useQuery<Warehouse>({
     queryKey: ['warehouse', id],
-    queryFn: () => apiClient.get<Warehouse>(`/api/warehouses/${id}/`),
+    queryFn: () => apiClient.get<Warehouse>(`/warehouses/${id}/`),
     enabled: !!id,
   });
 };
@@ -23,7 +23,7 @@ export const useCreateWarehouse = () => {
 
   return useMutation({
     mutationFn: (data: Partial<Warehouse>) =>
-      apiClient.post<Warehouse>('/api/warehouses/', data),
+      apiClient.post<Warehouse>('/warehouses/', data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['warehouses'] });
       toast.success('Armazém criado com sucesso');
@@ -39,7 +39,7 @@ export const useUpdateWarehouse = () => {
 
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: Partial<Warehouse> }) =>
-      apiClient.patch<Warehouse>(`/api/warehouses/${id}/`, data),
+      apiClient.patch<Warehouse>(`/warehouses/${id}/`, data),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['warehouses'] });
       queryClient.invalidateQueries({ queryKey: ['warehouse', variables.id] });
@@ -55,7 +55,7 @@ export const useDeleteWarehouse = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (id: string) => apiClient.delete(`/api/warehouses/${id}/`),
+    mutationFn: (id: string) => apiClient.delete(`/warehouses/${id}/`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['warehouses'] });
       toast.success('Armazém deletado com sucesso');

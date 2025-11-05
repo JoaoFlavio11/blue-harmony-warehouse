@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * API Client configurado para comunicação com Django API Backend
  * Base URL: localhost:8000/api (configurável via VITE_API_BASE_URL)

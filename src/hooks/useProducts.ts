@@ -1,86 +1,94 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { apiClient } from '@/lib/api-client';
-import { Product } from '@/types';
+import { productService, Product } from '@/services/warehouseService';
 import { toast } from '@/hooks/use-toast';
 
-export function useProducts() {
-  return useQuery<Product[]>({
+// Hook para listar produtos
+export const useProducts = () => {
+  return useQuery({
     queryKey: ['products'],
-    queryFn: () => apiClient.get<Product[]>('/products/'),
+    queryFn: productService.getAll,
+    retry: 1,
+    staleTime: 5000,
   });
-}
+};
 
-export function useProduct(id: string) {
-  return useQuery<Product>({
-    queryKey: ['products', id],
-    queryFn: () => apiClient.get<Product>(`/products/${id}/`),
+// Hook para buscar produto específico
+export const useProduct = (id: number) => {
+  return useQuery({
+    queryKey: ['product', id],
+    queryFn: () => productService.getById(id),
     enabled: !!id,
   });
-}
+};
 
-export function useCreateProduct() {
+// Hook para criar produto
+export const useCreateProduct = () => {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
-    mutationFn: (data: Partial<Product>) => apiClient.post<Product>('/products/', data),
+    mutationFn: productService.create,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['products'] });
       toast({
-        title: 'Sucesso',
-        description: 'Produto criado com sucesso',
+        title: 'Sucesso!',
+        description: 'Produto criado com sucesso.',
       });
     },
-    onError: () => {
+    onError: (error: any) => {
       toast({
         title: 'Erro',
-        description: 'Não foi possível criar o produto',
+        description: error.response?.data?.message || 'Falha ao criar produto.',
         variant: 'destructive',
       });
     },
   });
-}
+};
 
-export function useUpdateProduct() {
+// Hook para atualizar produto
+export const useUpdateProduct = () => {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: Partial<Product> }) =>
-      apiClient.patch<Product>(`/products/${id}/`, data),
-    onSuccess: () => {
+    mutationFn: ({ id, data }: { id: number; data: Partial<Product> }) =>
+      productService.update(id, data),
+    onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['products'] });
+      queryClient.invalidateQueries({ queryKey: ['product', variables.id] });
       toast({
-        title: 'Sucesso',
-        description: 'Produto atualizado com sucesso',
+        title: 'Sucesso!',
+        description: 'Produto atualizado com sucesso.',
       });
     },
-    onError: () => {
+    onError: (error: any) => {
       toast({
         title: 'Erro',
-        description: 'Não foi possível atualizar o produto',
+        description: error.response?.data?.message || 'Falha ao atualizar produto.',
         variant: 'destructive',
       });
     },
   });
-}
+};
 
-export function useDeleteProduct() {
+// Hook para deletar produto
+export const useDeleteProduct = () => {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
-    mutationFn: (id: string) => apiClient.delete(`/products/${id}/`),
+    mutationFn: productService.delete,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['products'] });
       toast({
-        title: 'Sucesso',
-        description: 'Produto deletado com sucesso',
+        title: 'Sucesso!',
+        description: 'Produto deletado com sucesso.',
       });
     },
-    onError: () => {
+    onError: (error: any) => {
       toast({
         title: 'Erro',
-        description: 'Não foi possível deletar o produto',
+        description: error.response?.data?.message || 'Falha ao deletar produto.',
         variant: 'destructive',
       });
     },
   });
-}
+};

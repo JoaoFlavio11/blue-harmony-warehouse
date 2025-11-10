@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+// src/pages/Reports.tsx
 import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -8,7 +10,7 @@ import { Download, FileText, Calendar as CalendarIcon } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { toast } from '@/hooks/use-toast';
-import { apiClient } from '@/lib/api-client';
+import  apiClient  from '@/lib/api-client';
 
 const reportTypes = [
   { value: 'inventory', label: 'Relatório de Inventário', description: 'Situação atual do estoque' },

@@ -1,4 +1,4 @@
-import { apiService } from './api';
+import { apiService } from '../lib/api-client';
 
 // Tipos (ajuste conforme seu modelo Django)
 export interface Product {

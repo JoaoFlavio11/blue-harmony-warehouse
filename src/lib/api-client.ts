@@ -1,111 +1,76 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/**
- * API Client configurado para comunicação com Django API Backend
- * Base URL: localhost:8000/api (configurável via VITE_API_BASE_URL)
- * Auth: Bearer token do Firebase
- */
+//src/lib/api-client.ts
+import axios from "axios";
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
 
-class ApiClient {
-  private baseUrl: string;
-  private token: string | null = null;
+// Instância principal do Axios
+export const apiClient = axios.create({
+  baseURL: API_BASE_URL,
+  headers: {
+    "Content-Type": "application/json",
+  },
+  withCredentials: true, // necessário para CORS com cookies/sessões
+});
 
-  constructor(baseUrl: string = API_BASE_URL) {
-    this.baseUrl = baseUrl;
-    // Carregar token do localStorage se existir
-    this.token = localStorage.getItem('auth_token');
-  }
-
-  setToken(token: string | null) {
-    this.token = token;
+// Interceptor para adicionar token (se houver)
+apiClient.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem("authToken");
     if (token) {
-      localStorage.setItem('auth_token', token);
-    } else {
-      localStorage.removeItem('auth_token');
+      config.headers.Authorization = `Bearer ${token}`;
     }
-  }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
 
-  getToken(): string | null {
-    return this.token;
-  }
+// Interceptor para tratamento de erros globais
+apiClient.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    console.error("API Error:", error.response || error.message);
 
-  private async request<T>(
-    endpoint: string,
-    options: RequestInit = {}
-  ): Promise<T> {
-    const headers: HeadersInit = {
-      'Content-Type': 'application/json',
-      ...options.headers,
-    };
-
-    if (this.token) {
-      headers['Authorization'] = `Bearer ${this.token}`;
+    if (error.response?.status === 401) {
+      // Token expirado ou inválido → limpa o localStorage
+      localStorage.removeItem("authToken");
+      // Opcional: redirecionar para login
+      // window.location.href = "/login";
     }
 
-    const config: RequestInit = {
-      ...options,
-      headers,
-    };
-
-    try {
-      const response = await fetch(`${this.baseUrl}${endpoint}`, config);
-
-      if (!response.ok) {
-        const error = await response.json().catch(() => ({
-          message: response.statusText,
-        }));
-        throw new Error(error.message || 'Request failed');
-      }
-
-      return response.json();
-    } catch (error) {
-      console.error('API Error:', error);
-      throw error;
-    }
+    return Promise.reject(error);
   }
+);
 
-  // GET request
-  async get<T>(endpoint: string, params?: Record<string, any>): Promise<T> {
-    const queryString = params
-      ? '?' + new URLSearchParams(params).toString()
-      : '';
-    return this.request<T>(`${endpoint}${queryString}`, {
-      method: 'GET',
-    });
-  }
-
-  // POST request
-  async post<T>(endpoint: string, data?: any): Promise<T> {
-    return this.request<T>(endpoint, {
-      method: 'POST',
-      body: JSON.stringify(data),
-    });
-  }
-
-  // PUT request
-  async put<T>(endpoint: string, data?: any): Promise<T> {
-    return this.request<T>(endpoint, {
-      method: 'PUT',
-      body: JSON.stringify(data),
-    });
-  }
-
-  // PATCH request
-  async patch<T>(endpoint: string, data?: any): Promise<T> {
-    return this.request<T>(endpoint, {
-      method: 'PATCH',
-      body: JSON.stringify(data),
-    });
-  }
-
-  // DELETE request
-  async delete<T>(endpoint: string): Promise<T> {
-    return this.request<T>(endpoint, {
-      method: 'DELETE',
-    });
-  }
+// Tipagem genérica para respostas
+export interface ApiResponse<T = any> {
+  data: T;
+  message?: string;
+  status: number;
 }
 
-export const apiClient = new ApiClient();
+// Serviço auxiliar para chamadas padronizadas
+export const apiService = {
+  get: async <T = any>(endpoint: string, params?: any): Promise<T> => {
+    const response = await apiClient.get<T>(endpoint, { params });
+    return response.data;
+  },
+  post: async <T = any>(endpoint: string, data?: any): Promise<T> => {
+    const response = await apiClient.post<T>(endpoint, data);
+    return response.data;
+  },
+  put: async <T = any>(endpoint: string, data?: any): Promise<T> => {
+    const response = await apiClient.put<T>(endpoint, data);
+    return response.data;
+  },
+  patch: async <T = any>(endpoint: string, data?: any): Promise<T> => {
+    const response = await apiClient.patch<T>(endpoint, data);
+    return response.data;
+  },
+  delete: async <T = any>(endpoint: string): Promise<T> => {
+    const response = await apiClient.delete<T>(endpoint);
+    return response.data;
+  },
+};
+
 export default apiClient;

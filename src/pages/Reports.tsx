@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+// src/pages/Reports.tsx
 import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -21,14 +23,12 @@ export default function Reports() {
   const [selectedReport, setSelectedReport] = useState<string>('');
   const [dateRange, setDateRange] = useState<{ from?: Date; to?: Date }>({});
   const [isGenerating, setIsGenerating] = useState(false);
+  const [data, setData] = useState<any[]>([]);
+  const [columns, setColumns] = useState<string[]>([]);
 
   const handleGenerateReport = async () => {
     if (!selectedReport) {
-      toast({
-        title: 'Erro',
-        description: 'Selecione um tipo de relatório',
-        variant: 'destructive',
-      });
+      toast({ title: 'Erro', description: 'Selecione um tipo de relatório', variant: 'destructive' });
       return;
     }
 
@@ -38,18 +38,14 @@ export default function Reports() {
       if (dateRange.from) params.start_date = format(dateRange.from, 'yyyy-MM-dd');
       if (dateRange.to) params.end_date = format(dateRange.to, 'yyyy-MM-dd');
 
-      await apiClient.get('/reports/generate/', params);
-      
-      toast({
-        title: 'Sucesso',
-        description: 'Relatório gerado com sucesso',
-      });
+      const res = await apiClient.get('/reports/generate/', { params });
+      const reportData = res.data?.data || [];
+      setData(reportData);
+      if (reportData.length > 0) setColumns(Object.keys(reportData[0]));
+
+      toast({ title: 'Sucesso', description: 'Relatório gerado com sucesso' });
     } catch (error) {
-      toast({
-        title: 'Erro',
-        description: 'Não foi possível gerar o relatório',
-        variant: 'destructive',
-      });
+      toast({ title: 'Erro', description: 'Não foi possível gerar o relatório', variant: 'destructive' });
     } finally {
       setIsGenerating(false);
     }
@@ -118,16 +114,43 @@ export default function Reports() {
             </Popover>
           </div>
 
-          <Button 
-            onClick={handleGenerateReport} 
-            disabled={isGenerating}
-            className="w-full"
-          >
+          <Button onClick={handleGenerateReport} disabled={isGenerating} className="w-full">
             <Download className="mr-2 h-4 w-4" />
             {isGenerating ? 'Gerando...' : 'Gerar Relatório'}
           </Button>
         </CardContent>
       </Card>
+
+      {data.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Resultado</CardTitle>
+            <CardDescription>Visualização do relatório gerado</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="overflow-x-auto">
+              <table className="min-w-full border">
+                <thead>
+                  <tr className="bg-muted text-left">
+                    {columns.map((col) => (
+                      <th key={col} className="p-2 capitalize border-b">{col}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {data.map((row, i) => (
+                    <tr key={i} className="border-b hover:bg-accent/30">
+                      {columns.map((col) => (
+                        <td key={col} className="p-2">{String(row[col] ?? '')}</td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       <Card>
         <CardHeader>

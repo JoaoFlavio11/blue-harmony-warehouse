@@ -15,7 +15,6 @@ const navigation = [
   { name: 'Armazéns', href: '/warehouses', icon: Warehouse },
   { name: 'Produtos', href: '/products', icon: Package },
   { name: 'Pedidos', href: '/orders', icon: ShoppingCart },
-  { name: 'Analytics', href: '/analytics', icon: BarChart3 },
   { name: 'Relatórios', href: '/reports', icon: FileText },
 ];
 

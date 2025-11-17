@@ -7,6 +7,13 @@ import { AxiosResponse } from "axios";
 import { Order, OrderApi, OrderItem, OrderItemApi } from "@/types";
 
 /* -----------------------------------------------------------
+   MOCK (ATIVAR PARA TESTAR SEM API)
+----------------------------------------------------------- */
+// descomente para usar mock:
+import { ordersMock } from "@/mocks/orderMock";
+
+
+/* -----------------------------------------------------------
    MAPEAMENTO API → FRONTEND
 ----------------------------------------------------------- */
 function mapItem(api: OrderItemApi): OrderItem {
@@ -21,14 +28,43 @@ function mapItem(api: OrderItemApi): OrderItem {
 
 function mapOrder(api: any): Order {
   return {
-    id: api.uid ?? api.id ?? api._id,
-    externalId: api.order_number ?? api.external_id,
+    id: api.id ?? api.uid ?? api._id ?? "",
+    externalId:
+      api.externalId ??
+      api.order_number ??
+      api.orderNumber ??
+      api.external_id ??
+      api.number ??
+      "",
+
     status: api.status ?? "pending",
-    createdAt: api.created_at ?? api.createdAt ?? "",
-    completedAt: api.completed_at ?? api.completedAt ?? null,
-    items: Array.isArray(api.items) ? api.items.map(mapItem) : [],
+
+    createdAt:
+      api.createdAt ??
+      api.created_at ??
+      api.creation_date ??
+      "",
+
+    completedAt:
+      api.completedAt ??
+      api.completed_at ??
+      null,
+
+    items: Array.isArray(api.items)
+      ? api.items.map((item: any) => ({
+          id: item.id ?? item.uid ?? "",
+          sku: item.sku ?? item.product_sku ?? "",
+          qty: item.qty ?? item.quantity ?? 0,
+          pickedQty:
+            item.pickedQty ??
+            item.picked_quantity ??
+            0,
+          binCode: item.bin_code ?? null,
+        }))
+      : [],
   };
 }
+
 
 /* -----------------------------------------------------------
    MAPEAMENTO FRONT → API
@@ -49,17 +85,25 @@ function mapOrderToApi(data: Partial<Order>) {
   };
 }
 
+
 /* -----------------------------------------------------------
-   1. LISTAR PEDIDOS (ROBUSTO)
+   1. LISTAR PEDIDOS
 ----------------------------------------------------------- */
 export function useOrders() {
+
+  // 🔥 MOCK OPCIONAL — descomentar para ativar
+  
+  return useQuery<Order[]>({
+    queryKey: ["orders"],
+    queryFn: async () => ordersMock
+  });
+  /*
   return useQuery<Order[]>({
     queryKey: ["orders"],
     queryFn: async () => {
       const res: AxiosResponse<any> = await apiClient.get("/orders/");
       const body = res.data;
 
-      // 🔥 Aceita tudo: lista direta, results, orders, data, items
       const raw =
         (Array.isArray(body) && body) ||
         body?.results ||
@@ -76,23 +120,35 @@ export function useOrders() {
       return raw.map(mapOrder);
     },
   });
+  */
 }
+
 
 /* -----------------------------------------------------------
    2. BUSCAR PEDIDO POR ID
 ----------------------------------------------------------- */
 export function useOrder(id: string) {
+
+  // 🔥 MOCK OPCIONAL — descomentar para ativar
+  
+  return useQuery<Order>({
+    queryKey: ["orders", id],
+    enabled: !!id,
+    queryFn: async () => ordersMock.find(o => o.id === id)!,
+  });
+  
+  /*
   return useQuery<Order>({
     queryKey: ["orders", id],
     enabled: !!id,
     queryFn: async () => {
-      const res: AxiosResponse<OrderApi> = await apiClient.get(
-        `/orders/${id}/`
-      );
+      const res: AxiosResponse<OrderApi> = await apiClient.get(`/orders/${id}/`);
       return mapOrder(res.data);
     },
   });
+  */
 }
+
 
 /* -----------------------------------------------------------
    3. CRIAR PEDIDO
@@ -103,26 +159,27 @@ export function useCreateOrder() {
   return useMutation({
     mutationFn: async (data: Partial<Order>) => {
       const payload = mapOrderToApi(data);
-      const res: AxiosResponse<OrderApi> = await apiClient.post(
-        "/orders/",
-        payload
-      );
+      const res: AxiosResponse<OrderApi> = await apiClient.post("/orders/", payload);
       return mapOrder(res.data);
     },
-
     onSuccess: () => {
-      toast({ title: "Pedido criado com sucesso!" });
       queryClient.invalidateQueries({ queryKey: ["orders"] });
+      toast({
+        title: "Pedido criado com sucesso!",
+        description: "O novo pedido foi adicionado à lista.",
+      });
     },
-
-    onError: () => {
+    onError: (error) => {
+      console.error("Erro ao criar pedido:", error);
       toast({
         title: "Erro ao criar pedido",
+        description: "Verifique os dados e tente novamente.",
         variant: "destructive",
       });
     },
   });
 }
+
 
 /* -----------------------------------------------------------
    4. ATUALIZAR PEDIDO
@@ -131,37 +188,30 @@ export function useUpdateOrder() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({
-      id,
-      data,
-    }: {
-      id: string;
-      data: Partial<Order>;
-    }) => {
+    mutationFn: async ({ id, data }: { id: string; data: Partial<Order> }) => {
       const payload = mapOrderToApi(data);
-
-      const res: AxiosResponse<OrderApi> = await apiClient.put(
-        `/orders/${id}/`,
-        payload
-      );
-
+      const res: AxiosResponse<OrderApi> = await apiClient.patch(`/orders/${id}/`, payload);
       return mapOrder(res.data);
     },
-
-    onSuccess: (_, vars) => {
-      toast({ title: "Pedido atualizado com sucesso!" });
+    onSuccess: (updatedOrder) => {
       queryClient.invalidateQueries({ queryKey: ["orders"] });
-      queryClient.invalidateQueries({ queryKey: ["orders", vars.id] });
+      queryClient.setQueryData(["orders", updatedOrder.id], updatedOrder);
+      toast({
+        title: "Pedido atualizado com sucesso!",
+        description: `O pedido ${updatedOrder.externalId} foi modificado.`,
+      });
     },
-
-    onError: () => {
+    onError: (error) => {
+      console.error("Erro ao atualizar pedido:", error);
       toast({
         title: "Erro ao atualizar pedido",
+        description: "Verifique os dados e tente novamente.",
         variant: "destructive",
       });
     },
   });
 }
+
 
 /* -----------------------------------------------------------
    5. DELETAR PEDIDO
@@ -174,15 +224,18 @@ export function useDeleteOrder() {
       await apiClient.delete(`/orders/${id}/`);
       return id;
     },
-
     onSuccess: () => {
-      toast({ title: "Pedido deletado!" });
       queryClient.invalidateQueries({ queryKey: ["orders"] });
+      toast({
+        title: "Pedido excluído com sucesso!",
+        description: "O pedido foi removido do sistema.",
+      });
     },
-
-    onError: () => {
+    onError: (error) => {
+      console.error("Erro ao deletar pedido:", error);
       toast({
         title: "Erro ao deletar pedido",
+        description: "Não foi possível remover o pedido.",
         variant: "destructive",
       });
     },

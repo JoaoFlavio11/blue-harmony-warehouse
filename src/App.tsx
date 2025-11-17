@@ -15,7 +15,6 @@ import Products from "./pages/Products";
 import ProductDetails from "./pages/ProductDetails";
 import Orders from "./pages/Orders";
 import OrderDetails from "./pages/OrderDetails";
-import Analytics from "./pages/Analytics";
 import Reports from "./pages/Reports";
 import NotFound from "./pages/NotFound";
 
@@ -48,7 +47,6 @@ const App = () => (
               <Route path="inventory" element={<div>Inventory (em desenvolvimento)</div>} />
               <Route path="orders" element={<Orders />} />
               <Route path="orders/:id" element={<OrderDetails />} />
-              <Route path="analytics" element={<Analytics />} />
               <Route path="reports" element={<Reports />} />
               <Route path="settings" element={<div>Settings (em desenvolvimento)</div>} />
             </Route>

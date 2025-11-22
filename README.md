@@ -1,73 +1,229 @@
-# Welcome to your Lovable project
+# 📦 Sistema WMS - Data Warehouse Frontend
 
-## Project info
+> Frontend React integrado com API Django para Warehouse Management System
 
-**URL**: https://lovable.dev/projects/f4b3c149-200b-453c-9529-3bb44edaf3b6
+[![React](https://img.shields.io/badge/React-18.3.1-blue)](https://react.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue)](https://www.typescriptlang.org/)
+[![TailwindCSS](https://img.shields.io/badge/TailwindCSS-3.x-38B2AC)](https://tailwindcss.com/)
+[![NextJs](https://img.shields.io/badge/NextJs-15.x-38B2AC)](https://nextjs.org/)
 
-## How can I edit this code?
+## 🎯 Visão Geral
 
-There are several ways of editing your application.
+Este é o **frontend React** do sistema WMS, integrado com o [backend Django + Neo4j](https://github.com/JoaoFlavio11/warehouse-api).
 
-**Use Lovable**
+### Principais Funcionalidades
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/f4b3c149-200b-453c-9529-3bb44edaf3b6) and start prompting.
+✅ Dashboard de Warehouses com estatísticas em tempo real  
+✅ Gerenciamento completo de produtos e estoque    
+✅ Histórico de movimentações de estoque  
+✅ Autenticação via Firebase  
+✅ API REST integrada com React Query  
 
-Changes made via Lovable will be committed automatically to this repo.
+---
 
-**Use your preferred IDE**
+## 🚀 Quick Start
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+### Pré-requisitos
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+- Node.js 18+ e npm
+- Backend rodando em http://localhost:8000 ([veja aqui](https://github.com/JoaoFlavio11/warehouse-api))
+- Projeto Firebase configurado
 
-Follow these steps:
+### Instalação
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+```bash
+# Clone o repositório
+git clone https://github.com/JoaoFlavio11/data-warehouse.git
+cd data-warehouse
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+# Instale as dependências
+npm install
 
-# Step 3: Install the necessary dependencies.
-npm i
+# Configure as variáveis de ambiente
+cp docs/.env.example .env.local
+# Edite .env.local com suas credenciais
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Inicie o servidor de desenvolvimento
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+Acesse: http://localhost:3000
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+---
 
-**Use GitHub Codespaces**
+## 🏗️ Arquitetura
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+```
+Frontend (React)
+├── Components
+│   ├── WarehouseDashboard
+│   ├── ProductsList
+│
+├── Services/API
+│   ├── warehouse.ts ──────────> Backend API
+│
+├── Hooks (React Query)
+│   ├── useWarehouse
+│
+└── Types (TypeScript)
+    ├── warehouse.ts
 
-## What technologies are used for this project?
+```
 
-This project is built with:
+---
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+## 📁 Estrutura do Projeto
 
-## How can I deploy this project?
+```
+src/
+├── components/          # Componentes React
+│   ├── warehouse/      # Componentes de warehouse
+│   └── ui/            # Componentes UI (shadcn)
+│
+├── services/
+│   └── api/           # Clients da API
+│       ├── client.ts       # Axios configurado
+│       ├── warehouse.ts    # Warehouse endpoints
+│
+├── hooks/             # Custom hooks
+│   ├── useWarehouse.ts
+│
+├── types/             # TypeScript types
+│   ├── warehouse.ts
+│
+├── pages/             # Páginas
+│   ├── Index.tsx
+│   └── NotFound.tsx
+│
+└── lib/               # Utilitários
+    └── utils.ts
+```
 
-Simply open [Lovable](https://lovable.dev/projects/f4b3c149-200b-453c-9529-3bb44edaf3b6) and click on Share -> Publish.
+---
 
-## Can I connect a custom domain to my Lovable project?
+## 🛠️ Stack Tecnológico
 
-Yes, you can!
+### Core
+- **React 18.3.1** - UI Library
+- **TypeScript** - Type Safety
+- **Vite** - Dev Server
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+### UI & Styling
+- **TailwindCSS** - Utility-first CSS
+- **shadcn/ui** - Componentes UI
+- **Lucide React** - Ícones
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+### Data Fetching & State
+- **React Query (TanStack Query)** - Server state management
+- **Axios** - HTTP client
+
+### Forms & Validation
+- **React Hook Form** - Formulários performáticos
+- **Zod** - Schema validation
+
+### Auth
+- **Firebase SDK** - Autenticação
+
+---
+
+## 🔌 API
+
+### Configuração
+
+Todas as chamadas de API são gerenciadas através do Axios client configurado:
+
+```typescript
+// src/services/api/client.ts
+import axios from 'axios';
+
+const apiClient = axios.create({
+  baseURL: import.meta.env.VITE_API_BASE_URL,
+  timeout: 30000,
+});
+
+// Interceptor para adicionar token Firebase
+apiClient.interceptors.request.use(async (config) => {
+  const token = localStorage.getItem('firebaseToken');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+```
+
+### Exemplo de Uso
+
+```typescript
+// Usando hook customizado
+import { useWarehouses } from '@/hooks/useWarehouse';
+
+function Dashboard() {
+  const { data: warehouses, isLoading, error } = useWarehouses();
+  
+  if (isLoading) return <Skeleton />;
+  if (error) return <Error />;
+  
+  return (
+    <div>
+      {warehouses.map(warehouse => (
+        <WarehouseCard key={warehouse.uid} warehouse={warehouse} />
+      ))}
+    </div>
+  );
+}
+```
+
+---
+
+## 🔐 Autenticação
+
+O sistema usa **Firebase Authentication**. Configure as credenciais em `.env.local`:
+
+---
+
+## 🧪 Scripts Disponíveis
+
+```bash
+# Desenvolvimento
+npm run dev              # Inicia servidor de desenvolvimento
+
+# Build
+npm run build           # Build para produção
+npm run preview         # Preview do build
+
+# Qualidade de Código
+npm run lint            # Verifica problemas no código
+npm run type-check      # Verifica tipos TypeScript
+```
+
+---
+
+## 🔗 Repositórios Relacionados
+
+- **Backend API**: [warehouse-api](https://github.com/JoaoFlavio11/warehouse-api)
+- **Frontend**: [data-warehouse](https://github.com/JoaoFlavio11/data-warehouse) (este repo)
+
+---
+
+## 👨‍💻 Autor
+
+**João Flávio**
+- GitHub: [@JoaoFlavio11](https://github.com/JoaoFlavio11)
+
+---
+
+## 🗺️ Roadmap
+
+- [x] ✅ Dashboard de warehouses
+- [x] ✅ Gerenciamento de produtos
+- [x] ✅ Controle de estoque
+- [x] ✅ Sistema de pedidos
+- [x] ✅ Analytics dashboard
+- [x] ✅ Real-time updates
+- [x] ✅ Relatórios em PDF
+
+**Legenda**: ✅ Implementado | 🚧 Em desenvolvimento | 📅 Planejado
+
+---
+
+**Última atualização**: dezembro 2025

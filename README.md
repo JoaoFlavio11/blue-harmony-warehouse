@@ -5,7 +5,7 @@
 [![React](https://img.shields.io/badge/React-18.3.1-blue)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue)](https://www.typescriptlang.org/)
 [![TailwindCSS](https://img.shields.io/badge/TailwindCSS-3.x-38B2AC)](https://tailwindcss.com/)
-[![NextJs](https://img.shields.io/badge/NextJs-15.x-38B2AC)](https://nextjs.org/)
+[![vite](https://img.shields.io/badge/vite-7.2-D689E8)]([https://vite.org/](https://vite.dev/))
 
 ## 🎯 Visão Geral
 

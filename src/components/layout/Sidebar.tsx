@@ -25,7 +25,7 @@ export const Sidebar = () => {
     <aside className="flex w-64 flex-col bg-sidebar border-r border-sidebar-border">
       <div className="flex h-16 items-center px-6 border-b border-sidebar-border">
         <h1 className="text-xl font-bold text-sidebar-foreground">
-          WMS System
+          Itens:
         </h1>
       </div>
       <nav className="flex-1 space-y-1 px-3 py-4">

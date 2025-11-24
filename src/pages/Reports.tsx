@@ -18,7 +18,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-// CORRETO: usar Calendar do shadcn
 import { Calendar } from "@/components/ui/calendar";
 
 import { DateRange } from "react-day-picker";
@@ -69,7 +68,7 @@ export default function Reports() {
     switch (selectedReport) {
       case "inventory": {
         const res = await apiClient.get<any[]>("/api/products/");
-        const items = res.data ?? res; // garante compatibilidade
+        const items = res.data ?? res;
 
         return items.map((p) => ({
           sku: p.sku,
@@ -138,7 +137,7 @@ export default function Reports() {
     const doc = new jsPDF();
 
     doc.setFontSize(16);
-    doc.text("Relatório - Blue Harmony Warehouse", 10, 10);
+    doc.text("Relatório - EasyRoute WMS", 10, 10);
 
     autoTable(doc, {
       startY: 20,

@@ -1,229 +1,168 @@
-# 📦 Sistema WMS - Data Warehouse Frontend
+<div align="center">
 
-> Frontend React integrado com API Django para Warehouse Management System
+# 💻 EasyRoute Web (Blue Harmony)
+### Dashboard de Gestão Logística e WMS
 
-[![React](https://img.shields.io/badge/React-18.3.1-blue)](https://react.dev/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue)](https://www.typescriptlang.org/)
-[![TailwindCSS](https://img.shields.io/badge/TailwindCSS-3.x-38B2AC)](https://tailwindcss.com/)
-[![vite](https://img.shields.io/badge/vite-7.2-D689E8)]([https://vite.org/](https://vite.dev/))
+![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
+![Vite](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=yellow)
+![TypeScript](https://img.shields.io/badge/typescript-%23007ACC.svg?style=for-the-badge&logo=typescript&logoColor=white)
+![TailwindCSS](https://img.shields.io/badge/tailwindcss-%2338B2AC.svg?style=for-the-badge&logo=tailwind-css&logoColor=white)
+![Firebase](https://img.shields.io/badge/Firebase-FFCA28?style=for-the-badge&logo=firebase&logoColor=black)
 
-## 🎯 Visão Geral
+![GitHub repo size](https://img.shields.io/github/repo-size/JoaoFlavio11/blue-harmony-warehouse?style=flat-square)
+![GitHub last commit](https://img.shields.io/github/last-commit/JoaoFlavio11/blue-harmony-warehouse?style=flat-square)
+![GitHub license](https://img.shields.io/github/license/JoaoFlavio11/blue-harmony-warehouse?style=flat-square)
 
-Este é o **frontend React** do sistema WMS, integrado com o [backend Django + Neo4j](https://github.com/JoaoFlavio11/warehouse-api).
-
-### Principais Funcionalidades
-
-✅ Dashboard de Warehouses com estatísticas em tempo real  
-✅ Gerenciamento completo de produtos e estoque    
-✅ Histórico de movimentações de estoque  
-✅ Autenticação via Firebase  
-✅ API REST integrada com React Query  
+</div>
 
 ---
 
-## 🚀 Quick Start
+## 📚 Sumário
+- [🎯 Visão Geral](#-visão-geral-do-projeto)
+- [🚀 Tecnologias Utilizadas](#-tecnologias-utilizadas)
+- [✨ Funcionalidades](#-funcionalidades)
+- [🏛️ Arquitetura](#-arquitetura-spa)
+- [🛠️ Instalação e Configuração](#-instalação-e-configuração)
+- [📂 Estrutura do Projeto](#-estrutura-do-projeto)
+
+---
+
+## 🎯 Visão Geral do Projeto
+
+O **EasyRoute Web** (codinome *Blue Harmony*) é o painel de controle frontend para o sistema de gerenciamento de armazém. Construído como uma **Single Page Application (SPA)** de alta performance utilizando **Vite** e **React**, ele oferece uma experiência ágil para gestores logísticos.
+
+O sistema consome a [Warehouse API](https://github.com/JoaoFlavio11/warehouse-api) para operações de dados e delega a gestão de identidade ao **Firebase Authentication**.
+
+---
+
+## 🚀 Tecnologias Utilizadas
+
+| Categoria | Tecnologia | Badge |
+| :--- | :--- | :--- |
+| **Frontend Lib** | React 18+ | ![React](https://img.shields.io/badge/-React-black?logo=react&logoColor=61DAFB) |
+| **Build Tool** | Vite | ![Vite](https://img.shields.io/badge/-Vite-646CFF?logo=vite&logoColor=white) |
+| **Linguagem** | TypeScript | ![TS](https://img.shields.io/badge/-TypeScript-3178C6?logo=typescript&logoColor=white) |
+| **Estilização** | Tailwind CSS | ![Tailwind](https://img.shields.io/badge/-Tailwind-38B2AC?logo=tailwind-css&logoColor=white) |
+| **Roteamento** | React Router DOM | ![Router](https://img.shields.io/badge/-Router-CA4245?logo=react-router&logoColor=white) |
+| **Auth** | Firebase Auth | ![Firebase](https://img.shields.io/badge/-Auth-FFCA28?logo=firebase&logoColor=black) |
+| **HTTP Client** | Axios / Fetch | ![Axios](https://img.shields.io/badge/-Axios-5A29E4?logo=axios&logoColor=white) |
+
+---
+
+## ✨ Funcionalidades
+
+### 🔐 Autenticação Segura
+* Login, Registro e Recuperação de Senha.
+* **Rotas Protegidas (`ProtectedLayout`):** Redirecionamento automático de usuários não autenticados.
+* Persistência de sessão com Firebase.
+
+### 📊 Dashboard Operacional
+* Cards de métricas em tempo real.
+* Gráficos de movimentação de estoque.
+* Visualização interativa de "Veículos e Rotas".
+
+### 📦 Gestão de WMS
+* Listagem de Produtos e Inventário.
+* Interface para criação de Pedidos.
+* Visualização de Relatórios.
+
+### ⚡ Performance DX
+* **Hot Module Replacement (HMR)** instantâneo com Vite.
+* Tipagem estrita com TypeScript para maior segurança no código.
+
+---
+
+## 🏛️ Arquitetura (SPA)
+
+Diferente de frameworks SSR, aqui o cliente assume a renderização completa, comunicando-se via REST com o backend.
+
+```mermaid
+graph LR
+    Browser[Navegador do Cliente]
+    
+    subgraph SPA [Vite + React]
+        Router[React Router]
+        Views[Páginas / Views]
+        Context[Auth Context]
+    end
+    
+    subgraph Cloud
+        Firebase[Firebase Auth]
+        API[Django API Backend]
+    end
+```
+## 🛠️ Instalação e Configuração
 
 ### Pré-requisitos
 
-- Node.js 18+ e npm
-- Backend rodando em http://localhost:8000 ([veja aqui](https://github.com/JoaoFlavio11/warehouse-api))
-- Projeto Firebase configurado
+  * Node.js 18+
+  * NPM ou Yarn
 
-### Instalação
+### Passo a Passo
 
-```bash
-# Clone o repositório
-git clone https://github.com/JoaoFlavio11/data-warehouse.git
-cd data-warehouse
+1.  **Clone o repositório**
 
-# Instale as dependências
-npm install
+    ```bash
+    git clone [https://github.com/JoaoFlavio11/blue-harmony-warehouse](https://github.com/JoaoFlavio11/blue-harmony-warehouse)
+    cd blue-harmony-warehouse
+    ```
 
-# Configure as variáveis de ambiente
-cp docs/.env.example .env.local
-# Edite .env.local com suas credenciais
+2.  **Instale as dependências**
 
-# Inicie o servidor de desenvolvimento
-npm run dev
+    ```bash
+    npm install
+    ```
+
+3.  **Configuração de Ambiente**
+    Crie um arquivo `.env` na raiz do projeto (Vite usa o prefixo `VITE_`):
+
+    ```env
+    VITE_FIREBASE_API_KEY=sua_api_key
+    VITE_FIREBASE_AUTH_DOMAIN=seu_projeto.firebaseapp.com
+    VITE_FIREBASE_PROJECT_ID=seu_project_id
+    VITE_FIREBASE_STORAGE_BUCKET=seu_bucket
+    VITE_FIREBASE_MESSAGING_SENDER_ID=seu_sender_id
+    VITE_FIREBASE_APP_ID=seu_app_id
+
+    VITE_API_BASE_URL=http://localhost:8000/api
+    ```
+
+4.  **Rodar o servidor de desenvolvimento**
+
+    ```bash
+    npm run dev
+    ```
+
+    > O app estará disponível em: [http://localhost:5173](https://www.google.com/search?q=http://localhost:5173)
+
+5.  **Build para Produção**
+
+    ```bash
+    npm run build
+    ```
+
+-----
+
+## 📂 Estrutura do Projeto
+
+A estrutura segue o padrão modular para React + Vite:
+
+```plaintext
+blue-harmony-warehouse/
+├── public/             # Assets estáticos públicos
+├── src/
+│   ├── assets/         # Imagens e estilos globais
+│   ├── components/     # Componentes UI reutilizáveis (Buttons, Cards)
+│   ├── contexts/       # Context API (AuthContext, ThemeContext)
+│   ├── hooks/          # Custom Hooks (useAuth, useFetch)
+│   ├── layouts/        # Layouts de página (DashboardLayout, AuthLayout)
+│   ├── pages/          # Páginas/Rotas (Login, Dashboard, Reports)
+│   ├── services/       # Configuração do Firebase e API Service
+│   ├── utils/          # Funções auxiliares e formatadores
+│   ├── App.tsx         # Configuração de Rotas Principal
+│   └── main.tsx        # Ponto de entrada (Entry point)
+├── .env                # Variáveis de ambiente
+├── tailwind.config.js  # Configuração do Tailwind
+├── vite.config.ts      # Configuração do Vite
+└── package.json
 ```
-
-Acesse: http://localhost:3000
-
----
-
-## 🏗️ Arquitetura
-
-```
-Frontend (React)
-├── Components
-│   ├── WarehouseDashboard
-│   ├── ProductsList
-│
-├── Services/API
-│   ├── warehouse.ts ──────────> Backend API
-│
-├── Hooks (React Query)
-│   ├── useWarehouse
-│
-└── Types (TypeScript)
-    ├── warehouse.ts
-
-```
-
----
-
-## 📁 Estrutura do Projeto
-
-```
-src/
-├── components/          # Componentes React
-│   ├── warehouse/      # Componentes de warehouse
-│   └── ui/            # Componentes UI (shadcn)
-│
-├── services/
-│   └── api/           # Clients da API
-│       ├── client.ts       # Axios configurado
-│       ├── warehouse.ts    # Warehouse endpoints
-│
-├── hooks/             # Custom hooks
-│   ├── useWarehouse.ts
-│
-├── types/             # TypeScript types
-│   ├── warehouse.ts
-│
-├── pages/             # Páginas
-│   ├── Index.tsx
-│   └── NotFound.tsx
-│
-└── lib/               # Utilitários
-    └── utils.ts
-```
-
----
-
-## 🛠️ Stack Tecnológico
-
-### Core
-- **React 18.3.1** - UI Library
-- **TypeScript** - Type Safety
-- **Vite** - Dev Server
-
-### UI & Styling
-- **TailwindCSS** - Utility-first CSS
-- **shadcn/ui** - Componentes UI
-- **Lucide React** - Ícones
-
-### Data Fetching & State
-- **React Query (TanStack Query)** - Server state management
-- **Axios** - HTTP client
-
-### Forms & Validation
-- **React Hook Form** - Formulários performáticos
-- **Zod** - Schema validation
-
-### Auth
-- **Firebase SDK** - Autenticação
-
----
-
-## 🔌 API
-
-### Configuração
-
-Todas as chamadas de API são gerenciadas através do Axios client configurado:
-
-```typescript
-// src/services/api/client.ts
-import axios from 'axios';
-
-const apiClient = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL,
-  timeout: 30000,
-});
-
-// Interceptor para adicionar token Firebase
-apiClient.interceptors.request.use(async (config) => {
-  const token = localStorage.getItem('firebaseToken');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
-```
-
-### Exemplo de Uso
-
-```typescript
-// Usando hook customizado
-import { useWarehouses } from '@/hooks/useWarehouse';
-
-function Dashboard() {
-  const { data: warehouses, isLoading, error } = useWarehouses();
-  
-  if (isLoading) return <Skeleton />;
-  if (error) return <Error />;
-  
-  return (
-    <div>
-      {warehouses.map(warehouse => (
-        <WarehouseCard key={warehouse.uid} warehouse={warehouse} />
-      ))}
-    </div>
-  );
-}
-```
-
----
-
-## 🔐 Autenticação
-
-O sistema usa **Firebase Authentication**. Configure as credenciais em `.env.local`:
-
----
-
-## 🧪 Scripts Disponíveis
-
-```bash
-# Desenvolvimento
-npm run dev              # Inicia servidor de desenvolvimento
-
-# Build
-npm run build           # Build para produção
-npm run preview         # Preview do build
-
-# Qualidade de Código
-npm run lint            # Verifica problemas no código
-npm run type-check      # Verifica tipos TypeScript
-```
-
----
-
-## 🔗 Repositórios Relacionados
-
-- **Backend API**: [warehouse-api](https://github.com/JoaoFlavio11/warehouse-api)
-- **Frontend**: [data-warehouse](https://github.com/JoaoFlavio11/data-warehouse) (este repo)
-
----
-
-## 👨‍💻 Autor
-
-**João Flávio**
-- GitHub: [@JoaoFlavio11](https://github.com/JoaoFlavio11)
-
----
-
-## 🗺️ Roadmap
-
-- [x] ✅ Dashboard de warehouses
-- [x] ✅ Gerenciamento de produtos
-- [x] ✅ Controle de estoque
-- [x] ✅ Sistema de pedidos
-- [x] ✅ Analytics dashboard
-- [x] ✅ Real-time updates
-- [x] ✅ Relatórios em PDF
-
-**Legenda**: ✅ Implementado | 🚧 Em desenvolvimento | 📅 Planejado
-
----
-
-**Última atualização**: dezembro 2025

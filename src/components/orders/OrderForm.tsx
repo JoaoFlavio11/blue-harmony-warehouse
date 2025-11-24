@@ -1,7 +1,7 @@
 import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { Order, OrderItem } from '@/types';
+import { Order } from "@/types";
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -22,17 +22,26 @@ import {
 } from '@/components/ui/select';
 import { Plus, Trash2 } from 'lucide-react';
 
+const STATUS_VALUES = [
+  "pending",
+  "reserved",
+  "picking",
+  "completed",
+  "cancelled",
+] as const;
+
+type StatusLiteral = typeof STATUS_VALUES[number];
+
 const orderItemSchema = z.object({
-  sku: z.string().min(1, 'SKU é obrigatório'),
-  qty: z.coerce.number().min(1, 'Quantidade mínima: 1'),
+  sku: z.string().min(1),
+  qty: z.coerce.number().min(1),
   pickedQty: z.coerce.number().optional(),
 });
 
 const orderSchema = z.object({
   externalId: z.string().optional(),
-  status: z.enum(['pending', 'reserved', 'picking', 'completed', 'cancelled']),
-  priority: z.coerce.number().min(1).max(10).optional(),
-  items: z.array(orderItemSchema).min(1, 'Adicione pelo menos um item'),
+  status: z.enum(STATUS_VALUES),
+  items: z.array(orderItemSchema).min(1),
 });
 
 type OrderFormValues = z.infer<typeof orderSchema>;
@@ -44,13 +53,21 @@ interface OrderFormProps {
 }
 
 export const OrderForm = ({ order, onSubmit, onCancel }: OrderFormProps) => {
+  const defaultItems =
+    order?.items?.map((item) => ({
+      sku: item.sku,
+      qty: item.qty,
+      pickedQty: item.pickedQty,
+    })) ?? [{ sku: '', qty: 1 }];
+
   const form = useForm<OrderFormValues>({
     resolver: zodResolver(orderSchema),
     defaultValues: {
       externalId: order?.externalId || '',
-      status: order?.status || 'pending',
-      priority: order?.priority || 1,
-      items: order?.items || [{ sku: '', qty: 1 }],
+      status: STATUS_VALUES.includes(order?.status as StatusLiteral)
+        ? (order?.status as StatusLiteral)
+        : "pending",
+      items: defaultItems,
     },
   });
 
@@ -60,7 +77,16 @@ export const OrderForm = ({ order, onSubmit, onCancel }: OrderFormProps) => {
   });
 
   const handleSubmit = (data: OrderFormValues) => {
-    onSubmit(data as Partial<Order>);
+    onSubmit({
+      id: order?.id,
+      externalId: data.externalId,
+      status: data.status,
+      items: data.items.map((i) => ({
+        sku: i.sku,
+        qty: i.qty,
+        pickedQty: i.pickedQty ?? 0,
+      })),
+    });
   };
 
   return (
@@ -80,24 +106,25 @@ export const OrderForm = ({ order, onSubmit, onCancel }: OrderFormProps) => {
           )}
         />
 
+        {/* STATUS */}
         <FormField
           control={form.control}
           name="status"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Status</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
+              <Select onValueChange={field.onChange} value={field.value}>
                 <FormControl>
                   <SelectTrigger>
                     <SelectValue placeholder="Selecione o status" />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  <SelectItem value="pending">Pendente</SelectItem>
-                  <SelectItem value="reserved">Reservado</SelectItem>
-                  <SelectItem value="picking">Separação</SelectItem>
-                  <SelectItem value="completed">Completo</SelectItem>
-                  <SelectItem value="cancelled">Cancelado</SelectItem>
+                  {STATUS_VALUES.map((s) => (
+                    <SelectItem key={s} value={s}>
+                      {s}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
               <FormMessage />
@@ -105,20 +132,7 @@ export const OrderForm = ({ order, onSubmit, onCancel }: OrderFormProps) => {
           )}
         />
 
-        <FormField
-          control={form.control}
-          name="priority"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Prioridade (1-10)</FormLabel>
-              <FormControl>
-                <Input type="number" min="1" max="10" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
+        {/* ITENS */}
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <Label>Itens do Pedido</Label>
@@ -135,6 +149,8 @@ export const OrderForm = ({ order, onSubmit, onCancel }: OrderFormProps) => {
 
           {fields.map((field, index) => (
             <div key={field.id} className="flex gap-2 items-end">
+
+              {/* SKU */}
               <FormField
                 control={form.control}
                 name={`items.${index}.sku`}
@@ -148,6 +164,8 @@ export const OrderForm = ({ order, onSubmit, onCancel }: OrderFormProps) => {
                   </FormItem>
                 )}
               />
+
+              {/* QUANTIDADE */}
               <FormField
                 control={form.control}
                 name={`items.${index}.qty`}
@@ -161,6 +179,8 @@ export const OrderForm = ({ order, onSubmit, onCancel }: OrderFormProps) => {
                   </FormItem>
                 )}
               />
+
+              {/* DELETE */}
               {fields.length > 1 && (
                 <Button
                   type="button"
@@ -176,6 +196,7 @@ export const OrderForm = ({ order, onSubmit, onCancel }: OrderFormProps) => {
           ))}
         </div>
 
+        {/* BOTÕES */}
         <div className="flex gap-2 justify-end">
           <Button type="button" variant="outline" onClick={onCancel}>
             Cancelar

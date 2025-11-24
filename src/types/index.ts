@@ -1,15 +1,21 @@
-/**
- * Type definitions para o WMS
- * Baseado no escopo e OpenAPI spec
- */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+// src/types/index.ts
+
+// =====================================================================
+// USERS
+// =====================================================================
 
 export type User = {
   id: string;
   email: string;
   name: string;
-  role: 'operator' | 'supervisor' | 'admin';
+  role: "operator" | "supervisor" | "admin";
   createdAt: string;
 };
+
+// =====================================================================
+// WAREHOUSE / INVENTORY ENTITIES
+// =====================================================================
 
 export type Warehouse = {
   id: string;
@@ -60,6 +66,10 @@ export type BinProduct = {
   qty: number;
 };
 
+// =====================================================================
+// PRODUCTS
+// =====================================================================
+
 export type Product = {
   id: string;
   sku: string;
@@ -75,42 +85,76 @@ export type Product = {
   metadata?: Record<string, any>;
 };
 
+// =====================================================================
+// INVENTORY MOVEMENTS
+// =====================================================================
+
 export type InventoryMovement = {
   id: string;
   product: string;
-  movement_type: 'in' | 'out';
+  movement_type: "in" | "out";
   quantity: number;
   reason?: string;
   timestamp: string;
   sku?: string;
   fromBin?: string;
   toBin?: string;
-  type?: 'receipt' | 'transfer' | 'pick' | 'adjustment';
+  type?: "receipt" | "transfer" | "pick" | "adjustment";
   createdBy?: string;
   createdAt?: string;
 };
 
-export type Order = {
-  id: string;
-  externalId?: string;
-  items: OrderItem[];
-  status: 'pending' | 'reserved' | 'picking' | 'completed' | 'cancelled';
-  priority?: number;
-  createdAt: string;
-  completedAt?: string;
-};
+// =====================================================================
+// ORDERS — API FORMAT (backend → frontend)
+// =====================================================================
 
-export type OrderItem = {
-  sku: string;
-  qty: number;
-  pickedQty?: number;
-};
+export interface OrderItemApi {
+  uid: string;
+  product_sku: string;
+  quantity: number;
+  picked_quantity: number;
+  bin_code?: string | null;
+}
+
+export interface OrderApi {
+  uid: string;
+  order_number: string;
+  status: 'pending' | 'reserved' | 'picking' | 'completed' | 'cancelled';
+  created_at: string;
+  completed_at: string | null;
+  items: OrderItemApi[];
+}
+
+// =====================================================================
+// ORDERS — FRONTEND FORMAT (UI)
+// =====================================================================
+
+export interface OrderItem {
+  id?: string; // uid
+  sku: string; // product_sku
+  qty: number; // quantity
+  pickedQty: number; // picked_quantity
+  binCode?: string | null;
+}
+
+export interface Order {
+  id: string;
+  externalId: string;
+  status: string;
+  createdAt: string;
+  completedAt: string | null;
+  items: OrderItem[];
+}
+
+// =====================================================================
+// ROUTES
+// =====================================================================
 
 export type Route = {
   id: string;
   name?: string;
   orderId: string;
-  status?: 'pending' | 'in_progress' | 'completed';
+  status?: "pending" | "in_progress" | "completed";
   sequence: RouteNode[];
   nodes: RouteNode[];
   estimatedDistanceM?: number;
@@ -130,14 +174,22 @@ export type RouteNode = {
   estimatedTime: number;
 };
 
+// =====================================================================
+// REPORTS
+// =====================================================================
+
 export type Report = {
   id: string;
-  type: 'inventory' | 'picking' | 'movement';
+  type: "inventory" | "picking" | "movement";
   warehouseId?: string;
-  format: 'pdf' | 'csv';
+  format: "pdf" | "csv";
   url: string;
   createdAt: string;
 };
+
+// =====================================================================
+// DASHBOARD
+// =====================================================================
 
 export type DashboardStats = {
   totalWarehouses: number;

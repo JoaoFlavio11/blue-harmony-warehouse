@@ -26,8 +26,8 @@ export const Header = () => {
   return (
     <header className="flex h-16 items-center justify-between border-b border-border bg-card px-6">
       <div className="flex items-center gap-4">
-        <h2 className="text-lg font-semibold text-foreground">
-          Sistema de Gerenciamento de Armazém
+        <h2 className="text-lg font-mono text-foreground">
+          EasyRoute-WMS
         </h2>
       </div>
 
@@ -49,11 +49,6 @@ export const Header = () => {
                 <p className="text-xs text-muted-foreground">{user?.email}</p>
               </div>
             </DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>
-              <User className="mr-2 h-4 w-4" />
-              Perfil
-            </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={logout} className="text-destructive">
               <LogOut className="mr-2 h-4 w-4" />

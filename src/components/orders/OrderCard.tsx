@@ -1,75 +1,80 @@
-import { Order } from '@/types';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Eye, Pencil, Trash2, Package } from 'lucide-react';
-import { format } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
+// src/components/orders/OrderCard.tsx
 
-interface OrderCardProps {
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Order } from '@/types';
+import { PackageSearch, Calendar, Edit, Trash2 } from 'lucide-react';
+
+type OrderCardProps = {
   order: Order;
-  onView: (id: string) => void;
   onEdit: (order: Order) => void;
   onDelete: (id: string) => void;
-}
-
-const statusConfig = {
-  pending: { label: 'Pendente', variant: 'secondary' as const },
-  reserved: { label: 'Reservado', variant: 'default' as const },
-  picking: { label: 'Separação', variant: 'warning' as const },
-  completed: { label: 'Completo', variant: 'success' as const },
-  cancelled: { label: 'Cancelado', variant: 'destructive' as const },
+  onView: (id: string) => void;
 };
 
-export const OrderCard = ({ order, onView, onEdit, onDelete }: OrderCardProps) => {
-  const statusInfo = statusConfig[order.status];
-  const totalItems = order.items.reduce((sum, item) => sum + item.qty, 0);
+export const OrderCard = ({ order, onEdit, onDelete, onView }: OrderCardProps) => {
+  const totalItems = order.items?.reduce((acc, i) => acc + i.qty, 0) ?? 0;
 
   return (
-    <Card className="hover:shadow-lg transition-shadow">
+    <Card
+      className="hover:shadow-lg transition-all cursor-pointer"
+      onClick={() => onView(order.id)}
+    >
       <CardHeader>
         <div className="flex items-start justify-between">
-          <div>
-            <CardTitle className="text-lg">
-              Pedido #{order.externalId || order.id.slice(0, 8)}
-            </CardTitle>
-            <p className="text-sm text-muted-foreground mt-1">
-              {format(new Date(order.createdAt), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
-            </p>
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-primary/10">
+              <PackageSearch className="h-6 w-6 text-primary" />
+            </div>
+
+            <div>
+              <CardTitle className="text-xl">
+                Pedido #{order.externalId}
+              </CardTitle>
+
+              <div className="flex items-center gap-1 text-sm text-muted-foreground mt-1">
+                <Calendar className="h-3 w-3" />
+                {new Date(order.createdAt).toLocaleDateString('pt-BR')}
+              </div>
+            </div>
           </div>
-          <Badge variant={statusInfo.variant}>{statusInfo.label}</Badge>
+
+          <Badge variant={order.status === 'completed' ? 'default' : 'secondary'}>
+            {order.status}
+          </Badge>
         </div>
       </CardHeader>
+
       <CardContent>
-        <div className="space-y-2">
-          <div className="flex items-center gap-2 text-sm">
-            <Package className="h-4 w-4 text-muted-foreground" />
-            <span>{order.items.length} produto(s) - {totalItems} unidade(s)</span>
+        <div className="space-y-4">
+
+          <div className="text-sm text-muted-foreground">
+            {totalItems} item{totalItems !== 1 ? 's' : ''}
           </div>
-          {order.priority && (
-            <Badge variant="outline">Prioridade: {order.priority}</Badge>
-          )}
+
+          <div className="flex gap-2 pt-2" onClick={(e) => e.stopPropagation()}>
+            <Button
+              variant="outline"
+              size="sm"
+              className="flex-1"
+              onClick={() => onEdit(order)}
+            >
+              <Edit className="h-4 w-4 mr-1" />
+              Editar
+            </Button>
+
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => onDelete(order.id)}
+            >
+              <Trash2 className="h-4 w-4 text-destructive" />
+            </Button>
+          </div>
+
         </div>
       </CardContent>
-      <CardFooter className="flex gap-2">
-        <Button variant="outline" size="sm" onClick={() => onView(order.id)}>
-          <Eye className="h-4 w-4 mr-1" />
-          Ver
-        </Button>
-        <Button variant="outline" size="sm" onClick={() => onEdit(order)}>
-          <Pencil className="h-4 w-4 mr-1" />
-          Editar
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => onDelete(order.id)}
-          className="text-destructive hover:text-destructive"
-        >
-          <Trash2 className="h-4 w-4 mr-1" />
-          Excluir
-        </Button>
-      </CardFooter>
     </Card>
   );
 };

@@ -18,8 +18,6 @@ export const WarehouseCard = ({
   onDelete,
   onView,
 }: WarehouseCardProps) => {
-  const occupancyPercent = (warehouse.occupancy / warehouse.capacity) * 100;
-  const isNearCapacity = occupancyPercent > 80;
 
   return (
     <Card className="hover:shadow-lg transition-all cursor-pointer" onClick={() => onView(warehouse.id)}>
@@ -39,22 +37,11 @@ export const WarehouseCard = ({
               )}
             </div>
           </div>
-          <Badge variant={isNearCapacity ? 'destructive' : 'default'}>
-            {occupancyPercent.toFixed(1)}% ocupado
-          </Badge>
         </div>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          <div>
-            <div className="flex justify-between text-sm mb-2">
-              <span className="text-muted-foreground">Capacidade</span>
-              <span className="font-medium">
-                {warehouse.occupancy} / {warehouse.capacity}
-              </span>
-            </div>
-            <Progress value={occupancyPercent} className="h-2" />
-          </div>
+          
 
           {warehouse.zones && warehouse.zones.length > 0 && (
             <div className="text-sm text-muted-foreground">

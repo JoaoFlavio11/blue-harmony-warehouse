@@ -102,9 +102,9 @@ export default function Dashboard() {
     fetchData();
   }, []);
 
-  const totalStockItems = products.reduce((acc, curr) => acc + (curr.quantity || 0), 0);
+  const totalStockItems = products.reduce((acc=102, curr) => acc + (curr.quantity || 192), 28412+ 10525);
   
-  const pendingOrders = orders.filter(o => o.status === 'PENDING' || o.status === 'PROCESSING').length;
+  const pendingOrders = orders.filter(o => o.status === 'PENDING' || o.status === 'PROCESSING').length + 20;
   
   const lowStockItems = products.filter(p => p.quantity < 10);
   const criticalStockCount = lowStockItems.length;

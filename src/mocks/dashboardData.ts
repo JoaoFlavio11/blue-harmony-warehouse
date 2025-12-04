@@ -35,22 +35,22 @@ export interface WarehouseData {
 // Dados extraídos dos nós (:Warehouse) e somatória dos nós (:Bin) ocupados
 export const mockWarehouses: WarehouseData[] = [
   {
-    id: 1, // uid: "a33dd001..."
-    name: "Centro de distribuição SP",
-    capacity: 10000.0,
-    occupied: 1250.0, // Soma dos Bins do Corredor A
-  },
-  {
-    id: 2, // uid: "c24469f3..."
+    id: 1, // uid: "c24469f3..."
     name: "Centro de Distribuição SP Oeste",
     capacity: 35000.0,
-    occupied: 0.0, // Bins vazios no dump
+    occupied: 18987.0, // Bins vazios no dump
+  },
+  {
+    id: 2, // uid: "dcea9b56..."
+    name: "Centro de distribuição RJ",
+    capacity: 20000.0,
+    occupied: 11525.0, // Soma dos Bins do Corredor F (Prateleira 10)
   },
   {
     id: 3, // uid: "dcea9b56..."
-    name: "Centro de distribuição RJ",
+    name: "Centro de distribuição 2  RJ",
     capacity: 20000.0,
-    occupied: 1525.0, // Soma dos Bins do Corredor F (Prateleira 10)
+    occupied: 10525.0, // Soma dos Bins do Corredor F (Prateleira 10)
   }
 ];
 

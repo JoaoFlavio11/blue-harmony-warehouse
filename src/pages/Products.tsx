@@ -17,7 +17,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { Plus, Loader2 } from 'lucide-react';
+import { Plus, Loader2, MapPin } from 'lucide-react';
 import { ProductCard } from '@/components/products/ProductCard';
 import { ProductForm } from '@/components/products/ProductForm';
 import {
@@ -92,6 +92,10 @@ export default function Products() {
     );
   }
 
+  // 🔹 MOCK FIXO DE LOCALIZAÇÃO
+  const mockLocation =
+    'Centro de Distribuição SP Oeste → Warehouse (Armazém) → Zone (Zona) → Aisle (Corredor) → Shelf (Prateleira) → Bin (Caixa)';
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -107,17 +111,32 @@ export default function Products() {
         </Button>
       </div>
 
+      {/* 🔥 MOCK DA LOCALIZAÇÃO NA LISTAGEM */}
+      <div className="flex items-center gap-2 text-muted-foreground p-4 border rounded-lg bg-muted/30">
+        <MapPin className="h-4 w-4" />
+        <span className="text-sm">
+          <strong>Dados locais do galpão:</strong> {mockLocation}
+        </span>
+      </div>
+
       {products && products.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
           {products.map((product) => (
             <ProductCard
               key={product.id}
-              product={product}
+              product={{
+                ...product,
+
+                // 🔥 INSERINDO A LOCALIZAÇÃO MOCK NO CARD
+                location: mockLocation,
+              }}
               onEdit={openEditForm}
               onDelete={setDeleteId}
               onView={(id) => navigate(`/products/${id}`)}
             />
           ))}
+
         </div>
       ) : (
         <div className="text-center py-12 border-2 border-dashed rounded-lg">

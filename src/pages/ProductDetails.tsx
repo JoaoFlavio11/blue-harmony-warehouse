@@ -18,7 +18,7 @@ import {
 } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { ArrowLeft, Loader2, Package, Plus, TrendingUp, TrendingDown } from 'lucide-react';
+import { ArrowLeft, Loader2, Package, Plus, TrendingUp, TrendingDown, MapPin } from 'lucide-react';
 import { useProduct } from '@/hooks/useProducts';
 import { useInventoryMovements, useCreateInventoryMovement } from '@/hooks/useInventory';
 import { format } from 'date-fns';
@@ -35,6 +35,10 @@ export default function ProductDetails() {
   const { data: product, isLoading } = useProduct(id || '');
   const { data: movements, isLoading: movementsLoading } = useInventoryMovements(id);
   const createMovement = useCreateInventoryMovement();
+
+  // MOCK DE LOCALIZAÇÃO (fixo)
+  const mockLocation =
+    'Centro de Distribuição SP Oeste → Warehouse (Armazém) → Zone (Zona) → Aisle (Corredor) → Shelf (Prateleira) → Bin (Caixa)';
 
   const handleCreateMovement = () => {
     if (!product || !quantity) return;
@@ -75,30 +79,38 @@ export default function ProductDetails() {
     );
   }
 
-  const stockStatus = 
-    product.current_stock === 0 
-      ? 'destructive' 
-      : product.current_stock <= product.minimum_stock 
-      ? 'warning' 
+  const stockStatus =
+    product.current_stock === 0
+      ? 'destructive'
+      : product.current_stock <= product.minimum_stock
+      ? 'warning'
       : 'success';
 
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-4">
-        <Button
-          variant="outline"
-          size="icon"
-          onClick={() => navigate('/products')}
-        >
+        <Button variant="outline" size="icon" onClick={() => navigate('/products')}>
           <ArrowLeft className="h-4 w-4" />
         </Button>
+
         <div className="flex-1">
           <h1 className="text-3xl font-bold">{product.name}</h1>
+
           <div className="flex items-center gap-2 text-muted-foreground mt-1">
             <Package className="h-4 w-4" />
             SKU: {product.sku}
           </div>
+
+          {/* === MOCK DE LOCALIZAÇÃO AQUI === */}
+          <div className="flex items-center gap-2 text-muted-foreground mt-2">
+            <MapPin className="h-4 w-4 text-primary" />
+            <span className="text-sm font-medium">
+              Alocado em: <span className="text-foreground">{mockLocation}</span>
+            </span>
+          </div>
+          {/* ================================ */}
         </div>
+
         <Badge variant={stockStatus} className="text-lg px-4 py-2">
           {product.current_stock} unidades
         </Badge>
@@ -223,7 +235,10 @@ export default function ProductDetails() {
           <div className="space-y-4">
             <div className="space-y-2">
               <Label>Tipo de Movimentação</Label>
-              <Select value={movementType} onValueChange={(v) => setMovementType(v as 'in' | 'out')}>
+              <Select
+                value={movementType}
+                onValueChange={(v) => setMovementType(v as 'in' | 'out')}
+              >
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
@@ -255,10 +270,7 @@ export default function ProductDetails() {
             </div>
 
             <div className="flex gap-2 justify-end pt-4">
-              <Button
-                variant="outline"
-                onClick={() => setIsMovementOpen(false)}
-              >
+              <Button variant="outline" onClick={() => setIsMovementOpen(false)}>
                 Cancelar
               </Button>
               <Button
